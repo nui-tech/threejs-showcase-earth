@@ -19,6 +19,8 @@ export class Scene3D {
   private equatorLine: THREE.Mesh | null = null;
   private longitudeLinesGroup: THREE.Group | null = null; // Added for longitude lines
   private latitudeLinesGroup: THREE.Group | null = null; // Added for latitude lines
+  private sunMesh: THREE.Mesh | null = null; // Added for Sun model
+  private sunLight: THREE.PointLight | null = null; // Added for Sun light
   private stats: Stats | null = null; // Added for Stats.js
   private autoRotateEnabled: boolean = true; // Controls auto-rotation
   private inactivityTimeoutId: number | null = null; // Timer for resuming rotation
@@ -53,7 +55,7 @@ export class Scene3D {
       75, // Field of view
       this.container.clientWidth / this.container.clientHeight || 1, // Initial aspect from container or fallback
       0.1, // Near clipping plane
-      10000 // Far clipping plane
+      100000 // Far clipping plane
     );
     this.camera.position.z = 160;
     
@@ -156,13 +158,30 @@ export class Scene3D {
     this.scene.add(axisHelper);
     
     // Add ambient light
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.1); // Adjusted intensity
     this.scene.add(ambientLight);
     
-    // Add directional light
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
-    directionalLight.position.set(5, 5, 5);
-    this.scene.add(directionalLight);
+    // REMOVED: const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+    // REMOVED: directionalLight.position.set(5, 5, 5);
+    // REMOVED: this.scene.add(directionalLight);
+
+    // Create a single TextureLoader instance
+    const textureLoader = new THREE.TextureLoader();
+
+    // Create Sun
+    const sunTexture = textureLoader.load('/8k_sun.jpg');
+    sunTexture.colorSpace = THREE.SRGBColorSpace;
+
+    const sunGeometry = new THREE.SphereGeometry(50 * 109, 64, 64); // Sun radius 50 * 109
+    const sunMaterial = new THREE.MeshBasicMaterial({ map: sunTexture });
+    this.sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
+    this.sunMesh.position.set(70000, 0, 0); // Position Sun further away
+    this.scene.add(this.sunMesh);
+
+    // Create PointLight for the Sun
+    this.sunLight = new THREE.PointLight(0xffffff, 500000, 0, 1); // color, intensity, distance, decay
+    this.sunLight.position.copy(this.sunMesh.position);
+    this.scene.add(this.sunLight);
     
     // Create a cube
     const geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -193,8 +212,8 @@ export class Scene3D {
     const earthGeometry = new THREE.SphereGeometry(1, 200, 200); // Radius 1, 64x64 segments for smoothness
     
     // Load Earth texture
-    const textureLoader = new THREE.TextureLoader();
-    const earthTexture = textureLoader.load('/8081_earthmap10k.jpg');
+    // const textureLoader = new THREE.TextureLoader(); // This was the redeclaration
+    const earthTexture = textureLoader.load('/8081_earthmap10k.jpg'); // Reuse textureLoader
     earthTexture.colorSpace = THREE.SRGBColorSpace; // Important for correct color display
 
     const earthMaterial = new THREE.MeshStandardMaterial({
@@ -414,6 +433,26 @@ export class Scene3D {
       if (this.targetPointMesh.material instanceof THREE.Material) {
         this.targetPointMesh.material.dispose();
       }
+    }
+
+    // Dispose of Sun mesh resources
+    if (this.sunMesh) {
+      if (this.sunMesh.geometry) {
+        this.sunMesh.geometry.dispose();
+      }
+      if (this.sunMesh.material instanceof THREE.MeshBasicMaterial) {
+        if (this.sunMesh.material.map) {
+          this.sunMesh.material.map.dispose();
+        }
+        this.sunMesh.material.dispose();
+      }
+      this.scene.remove(this.sunMesh); // Remove from scene
+    }
+
+    // Dispose of Sun light
+    if (this.sunLight) {
+      this.scene.remove(this.sunLight); // Remove from scene
+      this.sunLight.dispose(); // PointLight has a dispose method
     }
 
     // Dispose of Earth mesh resources
