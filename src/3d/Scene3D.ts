@@ -14,6 +14,7 @@ export class Scene3D {
   private clock: THREE.Clock;
   private targetPointMesh: THREE.Mesh;
   private earthMesh: THREE.Mesh;
+  private earthSystem: THREE.Group; // Group for Earth, pole, equator, to apply tilt
   private earthPole: THREE.Mesh | null = null;
   private equatorLine: THREE.Mesh | null = null;
   private longitudeLinesGroup: THREE.Group | null = null; // Added for longitude lines
@@ -32,6 +33,7 @@ export class Scene3D {
     
     // Initialize Three.js components
     this.scene = new THREE.Scene();
+    this.earthSystem = new THREE.Group(); // Initialize earthSystem
     // this.scene.background = new THREE.Color(0x111111); // Will be replaced by skybox
 
     // Skybox
@@ -137,6 +139,14 @@ export class Scene3D {
   initialize(): void {
     this.onContainerResize(); // ADDED: Call to set initial size correctly
 
+    // Add the earth system group that will be tilted to the scene
+    this.scene.add(this.earthSystem);
+
+    // Apply Earth's axial tilt (approx 23.5 degrees)
+    // We'll tilt it around the Z-axis, so the North Pole (positive Y) tilts towards positive X.
+    // This assumes the initial orientation of the Earth model has its North Pole along the positive Y-axis.
+    this.earthSystem.rotation.z = THREE.MathUtils.degToRad(23.5);
+
     // Add a grid helper for debugging
     const gridHelper = new THREE.GridHelper(10, 10, 0x888888, 0x444444);
     this.scene.add(gridHelper);
@@ -197,8 +207,8 @@ export class Scene3D {
     // Scale the mesh to form an ellipsoid
     this.earthMesh.scale.set(scaledEquatorialRadius, scaledPolarRadius, scaledEquatorialRadius);
     
-    this.earthMesh.position.set(0, 0, 0); // Position at the origin
-    this.scene.add(this.earthMesh);
+    this.earthMesh.position.set(0, 0, 0); // Position at the origin (relative to earthSystem)
+    this.earthSystem.add(this.earthMesh); // Add to the tilted earthSystem group
 
     // Create Longitude Lines
     this.longitudeLinesGroup = new THREE.Group();
@@ -269,7 +279,7 @@ export class Scene3D {
     const earthPole = new THREE.Mesh(poleGeometry, poleMaterial);
     // The cylinder is oriented along the Y-axis by default, which matches the Earth's polar axis.
     // It will be centered at the Earth's origin (0,0,0) by default.
-    this.scene.add(earthPole);
+    this.earthSystem.add(earthPole); // Add to the tilted earthSystem group
     this.earthPole = earthPole; // Store reference
 
     // Create and add Equator line
@@ -281,7 +291,7 @@ export class Scene3D {
     const equatorMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 }); // Yellow color for visibility
     const equatorLine = new THREE.Mesh(equatorGeometry, equatorMaterial);
     equatorLine.rotation.x = Math.PI / 2; // Rotate to align with the Earth's equator (around X-axis)
-    this.scene.add(equatorLine);
+    this.earthSystem.add(equatorLine); // Add to the tilted earthSystem group
     this.equatorLine = equatorLine; // Store reference
 
     // Prevent camera from zooming too close to the Earth
