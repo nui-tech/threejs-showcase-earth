@@ -1,0 +1,465 @@
+@use 'sass:color';
+
+// Variables
+:root {
+  // Colors
+  --color-primary: #007AFF;
+  --color-secondary: #5E5CE6;
+  --color-accent: #FF9500;
+  --color-success: #34C759;
+  --color-warning: #FF9500;
+  --color-error: #FF3B30;
+  
+  // Neutrals
+  --color-neutral-100: #F5F5F7;
+  --color-neutral-200: #E5E5EA;
+  --color-neutral-300: #D1D1D6;
+  --color-neutral-400: #C7C7CC;
+  --color-neutral-500: #AEAEB2;
+  --color-neutral-600: #8E8E93;
+  --color-neutral-700: #636366;
+  --color-neutral-800: #3A3A3C;
+  --color-neutral-900: #1C1C1E;
+  
+  // Background
+  --color-background: #FFFFFF;
+  --color-background-dark: #000000;
+  
+  // Text
+  --color-text: #000000;
+  --color-text-secondary: #8E8E93;
+  --color-text-light: #FFFFFF;
+  
+  // Spacing
+  --spacing-1: 8px;
+  --spacing-2: 16px;
+  --spacing-3: 24px;
+  --spacing-4: 32px;
+  --spacing-5: 40px;
+  --spacing-6: 48px;
+  
+  // Typography
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --font-size-xs: 0.75rem;   // 12px
+  --font-size-sm: 0.875rem;  // 14px
+  --font-size-md: 1rem;      // 16px
+  --font-size-lg: 1.125rem;  // 18px
+  --font-size-xl: 1.25rem;   // 20px
+  --font-size-2xl: 1.5rem;   // 24px
+  --font-size-3xl: 1.875rem; // 30px
+  --font-size-4xl: 2.25rem;  // 36px
+  
+  // Other
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --transition-duration: 0.3s;
+}
+
+// Base Styles
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-md);
+  line-height: 1.5;
+  color: var(--color-text);
+  background-color: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--transition-duration) ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: var(--color-background-dark);
+    color: var(--color-text-light);
+  }
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-duration) ease;
+  
+  &:hover {
+    color: color.adjust(#007AFF, $lightness: -10%);
+  }
+}
+
+button {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-1) var(--spacing-3);
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--transition-duration) ease, 
+              transform 0.1s ease;
+  
+  &:hover {
+    background-color: color.adjust(#007AFF, $lightness: -5%);
+  }
+  
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+// Layout
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-2);
+}
+
+// App structure
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+// Header
+.header {
+  padding: var(--spacing-2) 0;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--color-neutral-200);
+  
+  @media (prefers-color-scheme: dark) {
+    background: rgba(0, 0, 0, 0.8);
+    border-bottom: 1px solid var(--color-neutral-800);
+  }
+  
+  .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .logo {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    
+    a {
+      color: var(--color-text);
+      
+      @media (prefers-color-scheme: dark) {
+        color: var(--color-text-light);
+      }
+    }
+  }
+  
+  .nav {
+    display: flex;
+    gap: var(--spacing-3);
+    
+    a {
+      color: var(--color-text);
+      font-weight: 500;
+      transition: color var(--transition-duration) ease;
+      
+      &:hover, &.active {
+        color: var(--color-primary);
+      }
+      
+      @media (prefers-color-scheme: dark) {
+        color: var(--color-text-light);
+      }
+    }
+  }
+}
+
+// Main content
+.main-content {
+  flex-grow: 1; /* Takes up remaining space */
+  overflow-y: auto; /* Allow scrolling for main content if it overflows */
+  display: flex;
+  flex-direction: column;
+  position: relative; // Added to be the positioning context for absolute children
+}
+
+// Canvas container
+.canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0; // Positioned below the intro
+
+  /* General .canvas-container styles (background, border-radius) will still apply */
+  
+  canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  
+  .canvas-overlay {
+    position: absolute;
+    bottom: var(--spacing-3);
+    left: var(--spacing-3);
+    padding: var(--spacing-2);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border-radius: var(--border-radius-md);
+    pointer-events: none;
+    opacity: 0.8; /* Initial opacity */
+    transition: opacity 0.5s ease-out; /* Added transition for opacity */
+  }
+}
+
+// Home page
+.home-page {
+  .intro {
+    margin-bottom: var(--spacing-4);
+    
+    h1 {
+      font-size: var(--font-size-4xl);
+      line-height: 1.2;
+      margin-bottom: var(--spacing-2);
+      font-weight: 700;
+    }
+    
+    p {
+      font-size: var(--font-size-lg);
+      color: var(--color-text-secondary);
+      max-width: 600px;
+    }
+  }
+}
+
+/* HomePage Layout with Collapsible Sidebars */
+.home-page-layout {
+  display: flex;
+  height: 100vh; /* Full viewport height */
+  overflow: hidden; /* Prevent scrollbars on the layout itself */
+}
+
+.sidebar {
+  width: 250px; /* Default width of expanded sidebar */
+  background-color: #2c3e50; /* Dark background color */
+  color: #ecf0f1; /* Light text color */
+  padding: 15px;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.3); /* Adjusted shadow for dark theme */
+  transition: width 0.3s ease, padding 0.3s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* Allow scrolling within sidebar if content overflows */
+}
+
+.sidebar.collapsed {
+  width: 50px; /* Width of collapsed sidebar */
+  padding: 15px 0;
+}
+
+.sidebar.collapsed .sidebar-content {
+  display: none; /* Hide content when collapsed */
+}
+
+.sidebar-toggle {
+  background-color: #34495e; /* Darker toggle button background */
+  color: #ecf0f1; /* Light icon/text color for toggle */
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  font-size: 1.2em;
+  margin-bottom: 10px; /* Space between toggle and content */
+}
+
+.sidebar.collapsed .sidebar-toggle {
+  margin-bottom: 0;
+}
+
+.sidebar-toggle:hover {
+  background-color: #4a6278; /* Slightly lighter on hover for dark theme */
+}
+
+.sidebar-content {
+  flex-grow: 1;
+}
+
+.main-content {
+  flex-grow: 1; /* Takes up remaining space */
+  overflow-y: auto; /* Allow scrolling for main content if it overflows */
+  display: flex;
+  flex-direction: column;
+  position: relative; // Added to be the positioning context for absolute children
+}
+
+/* Ensure canvas container and intro take up space within main-content */
+.main-content .container {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 0; /* Fix for flexbox overflow in some browsers */
+}
+
+.main-content .intro {
+  flex-shrink: 0; /* Prevent intro from shrinking */
+  position: relative; // Added to allow z-indexing
+  z-index: 1; // Ensure intro is above the absolutely positioned canvas
+}
+
+.main-content .canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0; // Positioned below the intro
+  /* General .canvas-container styles (background, border-radius) will still apply */
+}
+
+#scene-container {
+  flex-grow: 1; /* Make the scene container fill the canvas-container */
+  width: 100%;
+  height: 100%;
+  min-height: 300px; /* Minimum height for the canvas */
+}
+
+.canvas-overlay {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.9em;
+  opacity: 1; /* Default opacity */
+  transition: opacity 0.5s ease-out; /* Transition for fade-out */
+}
+
+/* Not Found page */
+.not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: calc(100vh - 200px);
+  
+  h1 {
+    font-size: var(--font-size-4xl);
+    margin-bottom: var(--spacing-2);
+  }
+  
+  p {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-4);
+  }
+  
+  .back-button {
+    display: inline-block;
+  }
+}
+
+// Loading indicator
+.loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 1;
+  transition: opacity var(--transition-duration) ease;
+  
+  @media (prefers-color-scheme: dark) {
+    background: rgba(0, 0, 0, 0.9);
+  }
+  
+  &.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid transparent;
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Page transitions
+.page-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity var(--transition-duration) ease, 
+              transform var(--transition-duration) ease;
+}
+
+.page-exit {
+  opacity: 1;
+}
+
+.page-exit-active {
+  opacity: 0;
+  transition: opacity var(--transition-duration) ease;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .home-page .intro {
+    h1 {
+      font-size: var(--font-size-3xl);
+    }
+    
+    p {
+      font-size: var(--font-size-md);
+    }
+  }
+  
+  .canvas-container {
+    height: 50vh;
+  }
+  
+  .sidebar {
+    width: 200px; /* Adjust sidebar width for smaller screens */
+  }
+  .sidebar.collapsed {
+    width: 40px;
+  }
+}
