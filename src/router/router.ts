@@ -50,7 +50,7 @@ export class Router {
     let page = this.routes.get(path);
     
     if (!page) {
-      page = this.routes.get('*') || null;
+      page = this.routes.get('*') || undefined;
     }
     
     if (page) {
