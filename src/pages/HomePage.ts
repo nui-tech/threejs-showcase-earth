@@ -76,6 +76,13 @@ export class HomePage implements Page {
               Show FPS Stats
             </label>
           </div>
+
+          <div class="control-group">
+            <label for="show-renderer-info-checkbox">
+              <input type="checkbox" id="show-renderer-info-checkbox" checked>
+              Show Renderer Info
+            </label>
+          </div>
         </div>
       </div>
     `;
@@ -159,6 +166,7 @@ export class HomePage implements Page {
     const longitudeLinesCheckbox = this.element.querySelector('#show-longitude-lines-checkbox') as HTMLInputElement; // Added longitude lines checkbox
     const latitudeLinesCheckbox = this.element.querySelector('#show-latitude-lines-checkbox') as HTMLInputElement; // Added latitude lines checkbox
     const statsCheckbox = this.element.querySelector('#show-stats-checkbox') as HTMLInputElement; // Added stats checkbox
+    const rendererInfoCheckbox = this.element.querySelector('#show-renderer-info-checkbox') as HTMLInputElement; // Added renderer info checkbox
 
     poleCheckbox?.addEventListener('change', () => {
       this.scene?.togglePoleVisibility(poleCheckbox.checked);
@@ -180,6 +188,10 @@ export class HomePage implements Page {
       this.scene?.toggleStatsVisibility(statsCheckbox.checked);
     });
 
+    rendererInfoCheckbox?.addEventListener('change', () => { // Added event listener for renderer info
+      this.scene?.toggleRendererInfoVisibility(rendererInfoCheckbox.checked);
+    });
+
     // Set initial visibility based on checkboxes
     if (this.scene) { // Ensure scene is available
         this.scene.togglePoleVisibility(poleCheckbox.checked);
@@ -187,6 +199,7 @@ export class HomePage implements Page {
         this.scene.toggleLongitudeLinesVisibility(longitudeLinesCheckbox.checked); // Set initial longitude lines visibility
         this.scene.toggleLatitudeLinesVisibility(latitudeLinesCheckbox.checked); // Set initial latitude lines visibility
         this.scene.toggleStatsVisibility(statsCheckbox.checked); // Set initial stats visibility
+        this.scene.toggleRendererInfoVisibility(rendererInfoCheckbox.checked); // Set initial renderer info visibility
     }
   }
 }

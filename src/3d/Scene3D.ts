@@ -22,6 +22,7 @@ export class Scene3D {
   private sunMesh: THREE.Mesh | null = null; // Added for Sun model
   private sunLight: THREE.PointLight | null = null; // Added for Sun light
   private stats: Stats | null = null; // Added for Stats.js
+  private rendererInfoDiv: HTMLDivElement | null = null; // Added for renderer info
   private autoRotateEnabled: boolean = true; // Controls auto-rotation
   private inactivityTimeoutId: number | null = null; // Timer for resuming rotation
   private readonly INACTIVITY_RESUME_DELAY: number = 10000; // 10 seconds
@@ -102,8 +103,22 @@ export class Scene3D {
     this.stats.dom.style.right = '10px'; // Position from right of container
     this.stats.dom.style.left = 'auto'; // Ensure left is not set
     this.stats.dom.style.zIndex = '100'; // Ensure it's on top
-    this.stats.dom.style.transform = 'scale(0.5)'; // Scale down by 50%
     this.stats.dom.style.transformOrigin = 'top right'; // Adjust transform origin for scaling
+
+    // Initialize Renderer Info Div
+    this.rendererInfoDiv = document.createElement('div');
+    this.rendererInfoDiv.style.position = 'absolute';
+    this.rendererInfoDiv.style.top = '60px';
+    this.rendererInfoDiv.style.right = '10px';
+    this.rendererInfoDiv.style.color = 'white';
+    this.rendererInfoDiv.style.backgroundColor = 'rgba(0,0,0,0.5)';
+    this.rendererInfoDiv.style.padding = '5px';
+    this.rendererInfoDiv.style.fontFamily = 'Arial, sans-serif';
+    this.rendererInfoDiv.style.fontSize = '10px'; // Will be affected by scale
+    this.rendererInfoDiv.style.zIndex = '100';
+    this.rendererInfoDiv.style.display = 'none'; // Initially hidden
+    this.rendererInfoDiv.style.transformOrigin = 'top right'; // Adjust transform origin
+    this.container.appendChild(this.rendererInfoDiv);
   }
 
   private setupResizeObserver(): void { // ADDED method
@@ -264,7 +279,7 @@ export class Scene3D {
       transparent: true,
       opacity: 0.5,
     });
-    const latitudeLineSegments = 128; // More segments for smoother circles
+    const latitudeLineSegments = 256; // More segments for smoother circles
     const numLatitudeLines = 17; // e.g., every 10 degrees from -80 to +80, excluding equator
 
     for (let i = 0; i < numLatitudeLines; i++) {
@@ -359,6 +374,17 @@ export class Scene3D {
 
     if (this.stats) {
       this.stats.end(); // End FPS counter
+    }
+
+    // Update Renderer Info
+    if (this.rendererInfoDiv && this.rendererInfoDiv.style.display !== 'none') {
+      const info = this.renderer.info;
+      this.rendererInfoDiv.innerHTML = `
+        Geometries: ${info.memory.geometries}<br>
+        Textures: ${info.memory.textures}<br>
+        Draw Calls: ${info.render.calls}<br>
+        Triangles: ${info.render.triangles}
+      `;
     }
   }
   
@@ -513,6 +539,12 @@ export class Scene3D {
       this.stats.dom.parentNode.removeChild(this.stats.dom);
       this.stats = null;
     }
+
+    // Remove Renderer Info Div
+    if (this.rendererInfoDiv && this.rendererInfoDiv.parentNode) {
+      this.rendererInfoDiv.parentNode.removeChild(this.rendererInfoDiv);
+      this.rendererInfoDiv = null;
+    }
     
     // Remove renderer from DOM
     if (this.renderer.domElement.parentNode) {
@@ -555,6 +587,12 @@ export class Scene3D {
   public toggleStatsVisibility(visible: boolean): void { // Added method
     if (this.stats) {
       this.stats.dom.style.display = visible ? 'block' : 'none';
+    }
+  }
+
+  public toggleRendererInfoVisibility(visible: boolean): void {
+    if (this.rendererInfoDiv) {
+      this.rendererInfoDiv.style.display = visible ? 'block' : 'none';
     }
   }
 }
