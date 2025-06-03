@@ -46,6 +46,27 @@ export class HomePage implements Page {
               Show Latitude
             </label>
           </div>
+
+          <div class="control-group">
+            <label for="show-prime-meridian-checkbox">
+              <input type="checkbox" id="show-prime-meridian-checkbox" checked>
+              Show Prime Meridian
+            </label>
+          </div>
+
+          <div class="control-group">
+            <label for="show-antimeridian-checkbox">
+              <input type="checkbox" id="show-antimeridian-checkbox" checked>
+              Show Antimeridian
+            </label>
+          </div>
+
+          <div class="control-group">
+            <label for="auto-rotate-checkbox">
+              <input type="checkbox" id="auto-rotate-checkbox">
+              Auto Rotate
+            </label>
+          </div>
         </div>
       </div>
       <div class="main-content">
@@ -165,8 +186,11 @@ export class HomePage implements Page {
     const equatorCheckbox = this.element.querySelector('#show-equator-checkbox') as HTMLInputElement;
     const longitudeLinesCheckbox = this.element.querySelector('#show-longitude-lines-checkbox') as HTMLInputElement; // Added longitude lines checkbox
     const latitudeLinesCheckbox = this.element.querySelector('#show-latitude-lines-checkbox') as HTMLInputElement; // Added latitude lines checkbox
+    const primeMeridianCheckbox = this.element.querySelector('#show-prime-meridian-checkbox') as HTMLInputElement;
+    const antimeridianCheckbox = this.element.querySelector('#show-antimeridian-checkbox') as HTMLInputElement;
     const statsCheckbox = this.element.querySelector('#show-stats-checkbox') as HTMLInputElement; // Added stats checkbox
     const rendererInfoCheckbox = this.element.querySelector('#show-renderer-info-checkbox') as HTMLInputElement; // Added renderer info checkbox
+    const autoRotateCheckbox = this.element.querySelector('#auto-rotate-checkbox') as HTMLInputElement; // Added auto-rotate checkbox
 
     poleCheckbox?.addEventListener('change', () => {
       this.scene?.togglePoleVisibility(poleCheckbox.checked);
@@ -184,6 +208,14 @@ export class HomePage implements Page {
       this.scene?.toggleLatitudeLinesVisibility(latitudeLinesCheckbox.checked);
     });
 
+    primeMeridianCheckbox?.addEventListener('change', () => {
+      this.scene?.togglePrimeMeridianVisibility(primeMeridianCheckbox.checked);
+    });
+
+    antimeridianCheckbox?.addEventListener('change', () => {
+      this.scene?.toggleAntimeridianVisibility(antimeridianCheckbox.checked);
+    });
+
     statsCheckbox?.addEventListener('change', () => { // Added event listener for stats
       this.scene?.toggleStatsVisibility(statsCheckbox.checked);
     });
@@ -192,14 +224,21 @@ export class HomePage implements Page {
       this.scene?.toggleRendererInfoVisibility(rendererInfoCheckbox.checked);
     });
 
+    autoRotateCheckbox?.addEventListener('change', () => { // Added event listener for auto-rotate
+      this.scene?.toggleAutoRotate(autoRotateCheckbox.checked);
+    });
+
     // Set initial visibility based on checkboxes
     if (this.scene) { // Ensure scene is available
         this.scene.togglePoleVisibility(poleCheckbox.checked);
         this.scene.toggleEquatorVisibility(equatorCheckbox.checked);
         this.scene.toggleLongitudeLinesVisibility(longitudeLinesCheckbox.checked); // Set initial longitude lines visibility
         this.scene.toggleLatitudeLinesVisibility(latitudeLinesCheckbox.checked); // Set initial latitude lines visibility
+        this.scene.togglePrimeMeridianVisibility(primeMeridianCheckbox.checked); // Set initial Prime Meridian visibility
+        this.scene.toggleAntimeridianVisibility(antimeridianCheckbox.checked); // Set initial Antimeridian visibility
         this.scene.toggleStatsVisibility(statsCheckbox.checked); // Set initial stats visibility
         this.scene.toggleRendererInfoVisibility(rendererInfoCheckbox.checked); // Set initial renderer info visibility
+        this.scene.toggleAutoRotate(autoRotateCheckbox.checked); // Set initial auto-rotate state
     }
   }
 }
